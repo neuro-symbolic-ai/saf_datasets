@@ -52,7 +52,7 @@ class SentenceDataSet(Iterable[Sentence]):
         if (tag not in self._embeddings):
             if (tag in self[0].annotations):
                 embeddings = [sent.annotations[tag] for sent in tqdm(self, desc="Building embedding indices")]
-                self._embeddings = torch.stack(embeddings).to(device)
+                self._embeddings[tag] = torch.stack(embeddings).to(device)
                 for i, sent in enumerate(self):
                     sent.annotations[tag] = self._embeddings[i]
                     sent.annotations[f"{tag}_idx"] = i

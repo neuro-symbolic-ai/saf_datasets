@@ -3,7 +3,7 @@ from typing import Tuple, List, Dict, Union
 from zipfile import ZipFile
 from tqdm import tqdm
 from spacy.lang.en import English
-from saf import Sentence, Token
+from saf import Sentence, Token, Vocabulary
 from saf_datasets.annotators.spacy import SpacyAnnotator
 from .dataset import SentenceDataSet
 
@@ -67,6 +67,18 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
                 self._index[term].append(definition)
                 self._definitions.append(definition)
             self._size = len(self._definitions)
+
+    def vocabulary(self, source: str = "_token") -> Vocabulary:
+        if (source not in self._vocab):
+            self._vocab[source] = Vocabulary(self, source=source)
+        if (source == "_token"):
+            definiendum_vocab = Vocabulary(self, source="definiendum")
+            self._vocab[source].add_symbols(list(definiendum_vocab.symbols))
+            definiendum_vocab._vocab = self._vocab[source]._vocab
+            definiendum_vocab.freqs = self._vocab[source].freqs
+            self._vocab["definiendum"] = definiendum_vocab
+
+        return self._vocab[source]
 
 
 class WiktionaryDefinitionCorpusIterator:
