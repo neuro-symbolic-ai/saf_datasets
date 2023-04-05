@@ -38,12 +38,12 @@ class CPAEDataSet(SentenceDataSet):
         return len(self.data)
 
     def __getitem__(self, idx: int) -> Sentence:
-        """Fetches the ith definition in the dataset or all definitions for a given term.
+        """Fetches the ith definition in the dataset.
 
         Args:
             idx (int): index for the ith term in the dataset.
 
-        :return: A single term decomposition (Sentence).
+        :return: A single term definition (Sentence).
         """
         return self.data[idx]
 
