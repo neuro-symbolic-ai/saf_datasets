@@ -83,7 +83,7 @@ class SentenceDataSet(Iterable[Sentence]):
                     pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
                     pos_val.append(rel_pos[j])
 
-        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary(), repetitions)))
+        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions))
 
     # def to_embedding_indices(self, tag: str, pad_emb_idx: int = None, start_emb_idx: int = None,
     #                          end_emb_idx: int = None, device: str = "cpu") -> Tensor:
