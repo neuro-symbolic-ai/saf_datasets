@@ -3,6 +3,7 @@ import gdown
 import torch
 from pathlib import Path
 from typing import List, Dict, Iterable
+from collections import Counter
 from torch import Tensor
 from tqdm import tqdm
 from saf import Sentence, Vocabulary
@@ -46,7 +47,7 @@ class SentenceDataSet(Iterable[Sentence]):
     def to_indices(self, source: str = "_token", default: int = -1, padding: int = 0, pad_symbol: str = None,
                    start_symbol: str = None, end_symbol: str = None) -> Tensor:
         indices = self.vocabulary(source).to_indices(self, default, padding, pad_symbol, start_symbol, end_symbol)
-        return torch.tensor(indices, dtype=torch.int64)
+        return torch.tensor(indices, dtype=torch.int32)
 
     def embeddings(self, tag: str, device: str = "cpu") -> Tensor:
         if (tag not in self._embeddings):
@@ -68,6 +69,21 @@ class SentenceDataSet(Iterable[Sentence]):
                         tok.annotations[f"{tag}_idx"] = (i, j)
 
         return self._embeddings[tag]
+
+    def to_positional_indices(self, source: str = "_token", default: int = -1, repetitions: int = 4) -> Tensor:
+        indices = self.vocabulary(source).to_indices(self, default, 0, None, None, None)
+        pos_idx = list()
+        pos_val = list()
+        for i in range(len(indices)):
+            rel_pos = torch.tensor(range(1, len(indices[i]) + 1)) / len(indices[i])
+            rep_counter = Counter()
+            for j in range(len(indices[i])):
+                rep_counter.update((indices[i][j],))
+                if (rep_counter[indices[i][j]] <= repetitions):
+                    pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
+                    pos_val.append(rel_pos[j])
+
+        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary(), repetitions)))
 
     # def to_embedding_indices(self, tag: str, pad_emb_idx: int = None, start_emb_idx: int = None,
     #                          end_emb_idx: int = None, device: str = "cpu") -> Tensor:
