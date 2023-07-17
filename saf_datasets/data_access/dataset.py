@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Dict, Iterable
 from collections import Counter
 from torch import Tensor
+from torch.nn.functional import relu
 from tqdm import tqdm
 from saf import Sentence, Vocabulary
 
@@ -90,10 +91,11 @@ class SentenceDataSet(Iterable[Sentence]):
         sentences = list()
         for i in range(pos_indices.shape[0]):
             sentences.append(list())
-            sorted, indices = torch.sort(pos_indices[i].flatten())
+            sorted, indices = torch.sort(pos_indices[i].T.flatten())
+            pos_relu = relu(sorted)
+            indices = indices[pos_relu.nonzero()].flatten()
             for j in range(indices.shape[0]):
-                if (sorted[j] > 0):
-                    sentences[-1].append(vocab.get_symbol(j % len(vocab)))
+                sentences[-1].append(vocab.get_symbol(j % len(vocab)))
 
         return sentences
 
