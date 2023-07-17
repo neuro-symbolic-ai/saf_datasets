@@ -85,15 +85,17 @@ class SentenceDataSet(Iterable[Sentence]):
 
         return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions))
 
-    def from_positional_indices(self, pos_indices: Tensor, source: str = "_token") -> List[str]:
-        sorted, indices = torch.sort(pos_indices.flatten())
+    def from_positional_indices(self, pos_indices: Tensor, source: str = "_token") -> List[List[str]]:
         vocab = self.vocabulary(source)
-        sentence = list()
-        for i in range(indices.shape[0]):
-            if (sorted[i] > 0):
-                sentence.append(vocab.get_symbol(i % len(vocab)))
+        sentences = list()
+        for i in range(pos_indices.shape[0]):
+            sentences.append(list())
+            sorted, indices = torch.sort(pos_indices[i].flatten())
+            for j in range(indices.shape[0]):
+                if (sorted[j] > 0):
+                    sentences[-1].append(vocab.get_symbol(j % len(vocab)))
 
-        return sentence
+        return sentences
 
     # def to_embedding_indices(self, tag: str, pad_emb_idx: int = None, start_emb_idx: int = None,
     #                          end_emb_idx: int = None, device: str = "cpu") -> Tensor:
