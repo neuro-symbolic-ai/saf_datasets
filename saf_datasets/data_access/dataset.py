@@ -84,13 +84,13 @@ class SentenceDataSet(Iterable[Sentence]):
                     pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
                     pos_val.append(rel_pos[j])
 
-        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions))
+        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions)).mT
 
     def from_positional_indices(self, pos_indices: Tensor, source: str = "_token") -> List[List[str]]:
         vocab = self.vocabulary(source)
         sentences = list()
         for i in range(pos_indices.shape[0]):
-            sorted, indices = torch.sort(pos_indices[i].T.flatten())
+            sorted, indices = torch.sort(pos_indices[i].to_dense().flatten())
             pos_relu = relu(sorted)
             indices = indices[pos_relu.nonzero()].flatten()
             sentences.append([vocab.get_symbol(k % len(vocab)) for k in indices.tolist()])
