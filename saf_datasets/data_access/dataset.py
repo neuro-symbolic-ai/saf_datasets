@@ -90,12 +90,10 @@ class SentenceDataSet(Iterable[Sentence]):
         vocab = self.vocabulary(source)
         sentences = list()
         for i in range(pos_indices.shape[0]):
-            sentences.append(list())
             sorted, indices = torch.sort(pos_indices[i].T.flatten())
             pos_relu = relu(sorted)
             indices = indices[pos_relu.nonzero()].flatten()
-            for j in range(indices.shape[0]):
-                sentences[-1].append(vocab.get_symbol(j % len(vocab)))
+            sentences.append([vocab.get_symbol(k % len(vocab)) for k in indices.tolist()])
 
         return sentences
 
