@@ -68,11 +68,11 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
                 self._definitions.append(definition)
             self._size = len(self._definitions)
 
-    def vocabulary(self, source: str = "_token") -> Vocabulary:
+    def vocabulary(self, source: str = "_token", lowercase: bool = True) -> Vocabulary:
         if (source not in self._vocab):
-            self._vocab[source] = Vocabulary(self, source=source)
-        if (source == "_token"):
-            definiendum_vocab = Vocabulary(self, source="definiendum")
+            self._vocab[source] = Vocabulary(self, source=source, lowercase=lowercase)
+        if (source == "_token" or source == "lemma"):
+            definiendum_vocab = Vocabulary(self, source="definiendum", lowercase=lowercase)
             self._vocab[source].add_symbols(list(definiendum_vocab.symbols))
             definiendum_vocab._vocab = self._vocab[source]._vocab
             definiendum_vocab.freqs = self._vocab[source].freqs

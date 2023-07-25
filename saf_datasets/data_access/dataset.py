@@ -31,9 +31,9 @@ class SentenceDataSet(Iterable[Sentence]):
     def __getitem__(self, item):
         raise NotImplementedError
 
-    def vocabulary(self, source: str = "_token") -> Vocabulary:
+    def vocabulary(self, source: str = "_token", lowercase: bool = True) -> Vocabulary:
         if (source not in self._vocab):
-            self._vocab[source] = Vocabulary(self, source=source)
+            self._vocab[source] = Vocabulary(self, source=source, lowercase=lowercase)
 
         return self._vocab[source]
 
@@ -84,7 +84,7 @@ class SentenceDataSet(Iterable[Sentence]):
                     pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
                     pos_val.append(rel_pos[j])
 
-        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions)).mT
+        return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions)).mT.coalesce()
 
     def from_positional_indices(self, pos_indices: Tensor, source: str = "_token") -> List[List[str]]:
         vocab = self._vocab[source]

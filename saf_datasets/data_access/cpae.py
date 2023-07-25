@@ -6,6 +6,7 @@ from saf import Sentence, Token
 from saf_datasets.annotators.spacy import SpacyAnnotator
 from saf import Sentence, Vocabulary
 from .dataset import SentenceDataSet
+from .wiktionary import WiktionaryDefinitionCorpus
 
 PATH = "CPAE/cpae_definitions.csv.bz2"
 URL = "https://drive.google.com/uc?id=16B8hVf5NkubN4G_J_SrryA6A8YoxEZLP"
@@ -47,14 +48,5 @@ class CPAEDataSet(SentenceDataSet):
         """
         return self.data[idx]
 
-    def vocabulary(self, source: str = "_token") -> Vocabulary:
-        if (source not in self._vocab):
-            self._vocab[source] = Vocabulary(self, source=source)
-        if (source == "_token"):
-            definiendum_vocab = Vocabulary(self, source="definiendum")
-            self._vocab[source].add_symbols(list(definiendum_vocab.symbols))
-            definiendum_vocab._vocab = self._vocab[source]._vocab
-            definiendum_vocab.freqs = self._vocab[source].freqs
-            self._vocab["definiendum"] = definiendum_vocab
-
-        return self._vocab[source]
+    def vocabulary(self, source: str = "_token", lowercase: bool = True) -> Vocabulary:
+        return WiktionaryDefinitionCorpus.vocabulary(self, source, lowercase)
