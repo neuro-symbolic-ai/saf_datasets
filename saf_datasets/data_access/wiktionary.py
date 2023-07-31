@@ -96,9 +96,9 @@ class WiktionaryDefinitionCorpusIterator:
                     for pos in term["langs"][lang]["meanings"]:
                         for meaning in term["langs"][lang]["meanings"][pos]:
                             sentence = Sentence()
-                            sentence.annotations["definiendum"] = term["title"]
+                            sentence.annotations["definiendum"] = term["title"].strip()
                             sentence.annotations["definition_pos"] = pos
-                            definition = meaning["meaning"].replace("</text>", "")
+                            definition = meaning["meaning"].replace("</text>", "").strip()
                             sentence.surface = definition
                             for tok in self._wiktc.tokenizer(definition):
                                 token = Token()

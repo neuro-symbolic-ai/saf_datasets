@@ -83,7 +83,7 @@ class CODWOEDataSet(SentenceDataSet):
         sentence.annotations["emb_char"] = self._emb_char[idx]
         sentence.annotations["emb_electra"] = self._emb_electra[idx]
         sentence.annotations["emb_sgns"] = self._emb_sgns[idx]
-        sentence.surface = self._glosses[idx]
+        sentence.surface = self._glosses[idx].strip()
         for tok in self.tokenizer(sentence.surface):
             token = Token()
             token.surface = tok.text

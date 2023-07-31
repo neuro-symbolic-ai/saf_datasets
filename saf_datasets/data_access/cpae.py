@@ -22,8 +22,8 @@ class CPAEDataSet(SentenceDataSet):
             for line in tqdm(dataset_file, desc="Loading CPAE definition data"):
                 fields = line.split(";")
                 sentence = Sentence()
-                sentence.annotations["definiendum"] = fields[2]
-                definition = fields[3]
+                sentence.annotations["definiendum"] = fields[2].strip()
+                definition = fields[3].strip()
                 sentence.surface = definition
                 for tok in self.tokenizer(definition):
                     token = Token()
