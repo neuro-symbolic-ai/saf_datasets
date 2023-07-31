@@ -71,7 +71,8 @@ class SentenceDataSet(Iterable[Sentence]):
 
         return self._embeddings[tag]
 
-    def to_positional_indices(self, source: str = "_token", default: int = -1, repetitions: int = 4) -> Tensor:
+    def to_positional_indices(self, source: str = "_token", default: int = -1,
+                              repetitions: int = 4, omit_default: bool = True) -> Tensor:
         indices = self._vocab[source].to_indices(self, default, 0, None, None, None)
         pos_idx = list()
         pos_val = list()
@@ -79,10 +80,11 @@ class SentenceDataSet(Iterable[Sentence]):
             rel_pos = torch.tensor(range(1, len(indices[i]) + 1)) / len(indices[i])
             rep_counter = Counter()
             for j in range(len(indices[i])):
-                rep_counter.update((indices[i][j],))
-                if (rep_counter[indices[i][j]] <= repetitions):
-                    pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
-                    pos_val.append(rel_pos[j])
+                if (indices[i][j] != default or not omit_default):
+                    rep_counter.update((indices[i][j],))
+                    if (rep_counter[indices[i][j]] <= repetitions):
+                        pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
+                        pos_val.append(rel_pos[j])
 
         return torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions)).mT.coalesce()
 
