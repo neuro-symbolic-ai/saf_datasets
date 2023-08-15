@@ -107,7 +107,7 @@ class SentenceDataSet(Iterable[Sentence]):
         max_len = max([len(idxs) for idxs in indices])
         pe_tbl = torch.zeros(max_len, repetitions)
 
-        for i in range(max_len // 2 + 1):
+        for i in range(max_len // 2):
             for j in range(repetitions):
                 pe_tbl[i, 2 * j] = torch.sin(i / torch.tensor(pow(n, (2 * j) / repetitions)))
                 pe_tbl[i, 2 * j + 1] = torch.cos(i / torch.tensor(pow(n, (2 * j) / repetitions)))
