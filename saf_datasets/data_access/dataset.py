@@ -2,7 +2,7 @@ import os
 import gdown
 import torch
 from pathlib import Path
-from typing import List, Dict, Iterable
+from typing import Tuple, List, Dict, Iterable
 from collections import Counter
 from torch import Tensor
 from torch.nn.functional import relu
@@ -96,6 +96,50 @@ class SentenceDataSet(Iterable[Sentence]):
             pos_relu = relu(sorted)
             indices = indices[pos_relu.nonzero()].flatten()
             sentences.append([vocab.get_symbol(k % len(vocab)) for k in indices.tolist()])
+
+        return sentences
+
+    def to_positional_encoding(self, source: str = "_token", default: int = -1, repetitions: int = 4, n: int = 1000,
+                               omit_default: bool = True, offset: float = 1.0) -> Tuple[Tensor, Tensor]:
+        indices = self._vocab[source].to_indices(self, default, 0, None, None, None)
+        pos_idx = list()
+        pos_val = list()
+        max_len = max([len(idxs) for idxs in indices])
+        pe_tbl = torch.zeros(max_len, repetitions)
+
+        for i in range(max_len // 2 + 1):
+            for j in range(repetitions):
+                pe_tbl[i, 2 * j] = torch.sin(i / pow(n, (2 * j) / repetitions))
+                pe_tbl[i, 2 * j + 1] = torch.cos(i / pow(n, (2 * j) / repetitions))
+
+        for i in range(len(indices)):
+            rep_counter = Counter()
+            for j in range(len(indices[i])):
+                if (indices[i][j] != default or not omit_default):
+                    rep_counter.update((indices[i][j],))
+                    if (rep_counter[indices[i][j]] <= repetitions):
+                        pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
+                        pos_val.append(pe_tbl[i, rep_counter[indices[i][j]]] + offset)
+
+        penc = torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions))
+
+        return penc.mT.coalesce(), pe_tbl
+
+    def from_positional_encoding(self, pos_encoded: Tensor, pe_table: Tensor, offset: float = 1.0,
+                                 source: str = "_token") -> List[List[str]]:
+        vocab = self._vocab[source]
+        sentences = list()
+        for i in range(pos_encoded.shape[0]):
+            penc = pos_encoded[i]
+            indices = penc.indices().mT.tolist()
+            sent = [None] * len(indices)
+            for j, k in indices:
+                if (penc[j, k] >= offset - 1):
+                    dist = torch.abs(pe_table - penc[j, k])
+                    pe_k, pe_i = tuple((dist == dist.max()).nonzero()[0].tolist())
+                    sent[pe_k] = vocab.get_symbol(k)
+
+            sentences.append([sym for sym in sent if (sym)])
 
         return sentences
 
