@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='saf_datasets',
-    version='0.1.20',
+    version='0.1.21',
     packages=['saf_datasets', 'saf_datasets.annotators', 'saf_datasets.data_access'],
     url='',
     license='GNU General Public License v3.0',
