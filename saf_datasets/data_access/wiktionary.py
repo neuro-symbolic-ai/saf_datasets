@@ -74,6 +74,7 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
         if (source == "_token" or source == "lemma"):
             definiendum_vocab = Vocabulary(self, source="definiendum", lowercase=lowercase)
             self._vocab[source].add_symbols(list(definiendum_vocab.symbols))
+            self._vocab[source].freqs.update(definiendum_vocab.freqs)
             definiendum_vocab._vocab = self._vocab[source]._vocab
             definiendum_vocab.freqs = self._vocab[source].freqs
             self._vocab["definiendum"] = definiendum_vocab

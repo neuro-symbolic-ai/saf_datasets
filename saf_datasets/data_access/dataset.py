@@ -107,8 +107,8 @@ class SentenceDataSet(Iterable[Sentence]):
         max_len = max([len(idxs) for idxs in indices])
         pe_tbl = torch.zeros(max_len, repetitions)
 
-        for i in range(max_len // 2):
-            for j in range(repetitions):
+        for i in range(max_len):
+            for j in range(repetitions // 2):
                 pe_tbl[i, 2 * j] = torch.sin(i / torch.tensor(pow(n, (2 * j) / repetitions)))
                 pe_tbl[i, 2 * j + 1] = torch.cos(i / torch.tensor(pow(n, (2 * j) / repetitions)))
 
@@ -119,9 +119,9 @@ class SentenceDataSet(Iterable[Sentence]):
                     rep_counter.update((indices[i][j],))
                     if (rep_counter[indices[i][j]] <= repetitions):
                         pos_idx.append([i, indices[i][j], rep_counter[indices[i][j]] - 1])
-                        pos_val.append(pe_tbl[i, rep_counter[indices[i][j]]] + offset)
+                        pos_val.append(pe_tbl[j, rep_counter[indices[i][j]] - 1] + offset)
 
-        penc = torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self.vocabulary()), repetitions))
+        penc = torch.sparse_coo_tensor(list(zip(*pos_idx)), pos_val, (len(indices), len(self._vocab[source]), repetitions))
 
         return penc.mT.coalesce(), pe_tbl
 
@@ -131,7 +131,7 @@ class SentenceDataSet(Iterable[Sentence]):
         sentences = list()
         for i in range(pos_encoded.shape[0]):
             penc = pos_encoded[i]
-            indices = penc.indices().mT.tolist()
+            indices = penc._indices().mT.tolist()
             sent = [None] * len(indices)
             for j, k in indices:
                 if (penc[j, k] >= offset - 1):
