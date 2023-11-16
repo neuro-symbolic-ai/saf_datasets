@@ -1,0 +1,9 @@
+saf @ git+https://github.com/dscarvalho/saf.git
+spacy
+gdown
+tqdm
+torch
+jsonlines
+transformers
+sentencepiece
+protobuf

@@ -3,9 +3,7 @@ import gzip
 from csv import DictReader
 from tqdm import tqdm
 from spacy.lang.en import English
-from saf import Sentence, Token
-from saf_datasets.annotators.spacy import SpacyAnnotator
-from saf import Sentence, Vocabulary
+from saf import Sentence, Token, Vocabulary
 from .dataset import SentenceDataSet
 
 PATH = "AllNLI/AllNLI.tsv.gz"
