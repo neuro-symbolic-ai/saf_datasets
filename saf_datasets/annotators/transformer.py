@@ -1,21 +1,43 @@
-import json
+import os
+import gdown
 from typing import Dict, Iterable
+from pathlib import Path
 from tqdm import tqdm
+from zipfile import ZipFile
 from torch import argmax, as_tensor, cuda
 from transformers import AutoTokenizer, AutoConfig, AutoModelForTokenClassification
-from transformers import EarlyStoppingCallback, IntervalStrategy
 from saf import Sentence
 from saf.annotators import Annotator
+from .models import PRETRAINED_MODELS
 
+BASE_PATH = ".saf_models"
 
 class TransformerAnnotator(Annotator):
-    def __init__(self, annot_model: str, labels: Dict[str, str], max_len: int = 128):
+    def __init__(self, annot_model: str, labels: Dict[int, str] = None, max_len: int = 128, device: str = None):
         super(TransformerAnnotator, self).__init__()
-        self.device = 'cuda' if cuda.is_available() else 'cpu'
+        if (not device):
+            if (cuda.is_available()):
+                self.device = "cuda"
+            else:
+                self.device = "cpu"
+        else:
+            self.device = device
+
+        if (annot_model in PRETRAINED_MODELS):
+            path = PRETRAINED_MODELS[annot_model]["path"]
+            url = PRETRAINED_MODELS[annot_model]["url"]
+            self.model_path: str = os.path.normpath(os.path.join(str(Path.home()), BASE_PATH, path))
+            if (not os.path.exists(self.model_path)):
+                os.makedirs(os.path.join(*os.path.split(self.model_path)[:-1]), exist_ok=True)
+                gdown.download(url, self.model_path)
+                ZipFile(self.model_path).extractall(self.model_path.replace(".zip", ""))
+            annot_model = self.model_path.replace(".zip", "")
+
         self.annot_model = AutoModelForTokenClassification.from_pretrained(annot_model).to(self.device)
         self.annot_tokenizer = AutoTokenizer.from_pretrained(annot_model)
-        self.ids_to_labels = labels
-        self.MAX_LEN = max_len
+        self.annot_config = AutoConfig.from_pretrained(annot_model)
+        self.ids_to_labels = labels if labels else self.annot_config.id2label
+        self.max_len = max_len
 
     def annotate(self, definitions: Iterable[Sentence]):
         for defn in tqdm(definitions, desc="Annotating (Transformer)"):
@@ -26,7 +48,7 @@ class TransformerAnnotator(Annotator):
                                           return_offsets_mapping=True,
                                           truncation=True,
                                           padding='max_length',
-                                          max_length=self.MAX_LEN)
+                                          max_length=self.max_len)
             item = {key: as_tensor(val) for key, val in inputs.items()}
             ids = item["input_ids"].unsqueeze(0).to(self.device)
             mask = item["attention_mask"].unsqueeze(0).to(self.device)
@@ -37,7 +59,7 @@ class TransformerAnnotator(Annotator):
             flattened_predictions = argmax(active_logits, axis=1) # shape (batch_size*seq_len,) - predictions at the token level
             # mapping tags to words
             tokens = self.annot_tokenizer.convert_ids_to_tokens(ids.squeeze().tolist())
-            token_predictions = [self.ids_to_labels[str(i)] for i in flattened_predictions.cpu().numpy()]
+            token_predictions = [self.ids_to_labels[i] for i in flattened_predictions.cpu().numpy()]
             wp_preds = list(zip(tokens, token_predictions)) # list of tuples. Each tuple = (wordpiece, prediction)
             prediction = []
             for token_pred, mapping in zip(wp_preds, item["offset_mapping"].squeeze().tolist()):
