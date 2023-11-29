@@ -106,6 +106,9 @@ class WiktionaryDefinitionCorpusIterator:
                                 token.surface = tok.text
                                 sentence.tokens.append(token)
 
+                            if (len(sentence.tokens) == 0):
+                                continue
+
                             yield sentence
 
 
