@@ -7,3 +7,4 @@ jsonlines
 transformers
 sentencepiece
 protobuf
+jsonpickle
