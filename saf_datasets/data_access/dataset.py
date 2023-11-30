@@ -155,6 +155,14 @@ class SentenceDataSet(Iterable[Sentence]):
     #
     #     return self._emb_indices[tag]
 
+    @staticmethod
+    def download_resource(path: str, url: str):
+        data_path: str = os.path.normpath(os.path.join(str(Path.home()), BASE_PATH, path))
+        if (not os.path.exists(data_path)):
+            os.makedirs(os.path.join(*os.path.split(data_path)[:-1]), exist_ok=True)
+            gdown.download(url, data_path)
+
+        return data_path
 
 
 
