@@ -1,5 +1,5 @@
 import jsonlines
-import jsonpickle
+import pickle
 import gzip
 from typing import Tuple, List, Dict, Union
 from zipfile import ZipFile
@@ -13,8 +13,8 @@ PATH = "wiktionary/enwiktdb_sorted_en.jsonl.zip"
 URL = "https://drive.google.com/uc?id=110xF4OGjUiwc7ONHq9L5C4znByamq4vv"
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
-        "path": "wiktionary/wikdef_spacy_dsr.json.gz",
-        "url": "https://drive.google.com/uc?id=17GAAvGCPd-cSRiGGz2a8KDGGEjuCmDfo"
+        "path": "wiktionary/wikdef_spacy_dsr.pickle.gz",
+        "url": "https://drive.google.com/uc?id=1FuBr2LIljV1s29Zik0v81YA3eaws1Cf2"
     }
 }
 
@@ -91,12 +91,13 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
 
     @staticmethod
     def from_resource(locator: str):
+        wiktdef = None
         if (locator in ANNOT_RESOURCES):
             path = ANNOT_RESOURCES[locator]["path"]
             url = ANNOT_RESOURCES[locator]["url"]
             data_path = WiktionaryDefinitionCorpus.download_resource(path, url)
-            with gzip.open(data_path) as resource_file:
-                data = jsonpickle.decode(resource_file.read())
+            with gzip.open(data_path, "rb") as resource_file:
+                data = pickle.load(resource_file)
 
             wiktdef = WiktionaryDefinitionCorpus()
             for definition in tqdm(data, desc=f"Loading data from resource: {locator}"):
