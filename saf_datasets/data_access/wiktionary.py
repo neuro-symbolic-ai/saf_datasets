@@ -60,7 +60,7 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
                 definition = self._index[item]
             else:
                 definition = []
-        elif (isinstance(item, int)):
+        elif (isinstance(item, int) or isinstance(item, slice)):
             definition = self._definitions[item]
 
         return definition
