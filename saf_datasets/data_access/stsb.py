@@ -45,7 +45,7 @@ class STSBDataSet(SentenceDataSet):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, idx: int) -> Sentence:
+    def __getitem__(self, idx) -> Sentence:
         """Fetches the ith sentence in the dataset.
 
         Args:

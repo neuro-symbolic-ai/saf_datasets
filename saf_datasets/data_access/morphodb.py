@@ -22,7 +22,7 @@ class MorphoDecompDataSet(SentenceDataSet):
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, idx: int) -> Sentence:
+    def __getitem__(self, idx) -> Sentence:
         """Fetches the ith definition in the dataset or all definitions for a given term.
 
         Args:

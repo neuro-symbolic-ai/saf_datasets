@@ -2,15 +2,14 @@ import jsonlines
 import pickle
 import gzip
 from typing import Tuple, List, Dict, Union
-from zipfile import ZipFile
 from tqdm import tqdm
 from spacy.lang.en import English
 from saf import Sentence, Token, Vocabulary
 from saf_datasets.annotators.spacy import SpacyAnnotator
 from .dataset import SentenceDataSet
 
-PATH = "wiktionary/enwiktdb_sorted_en.jsonl.zip"
-URL = "https://drive.google.com/uc?id=110xF4OGjUiwc7ONHq9L5C4znByamq4vv"
+PATH = "wiktionary/raw-wiktextract-data_2024-01-20.jsonl.gz"  # From https://kaikki.org/dictionary/rawdata.html
+URL = "https://drive.google.com/uc?id=1ZMZe25lhjl14p0kEJVxedwmMZV2KUBrz"
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
         "path": "wiktionary/wikdef_spacy_dsr.pickle.gz",
@@ -22,16 +21,12 @@ ANNOT_RESOURCES = {
 class WiktionaryDefinitionCorpus(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",)):
         super(WiktionaryDefinitionCorpus, self).__init__(path, url)
-        wikt_zip = ZipFile(self.data_path)
-        self._source = wikt_zip.open(wikt_zip.namelist()[0])
-        self._size: int = 0
+        self._source = gzip.open(self.data_path)
+        self._size: int = -1
         self.langs: Tuple[str] = langs
         self._index: Dict[str, List[Sentence]] = dict()
         self._definitions: List[Sentence] = list()
         self.tokenizer = English().tokenizer
-
-        for line in self._source:
-            self._size += 1
 
         self._source.seek(0)
 
@@ -43,6 +38,14 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
             return WiktionaryDefinitionCorpusIterator(self)
 
     def __len__(self):
+        if (self._size == -1):
+            with jsonlines.Reader(self._source) as reader:
+                for term in tqdm(reader, desc="Checking data"):
+                    if ("word" in term and term["lang"] in self.langs):
+                        self._size += 1
+
+            self._source.seek(0)
+
         return self._size
 
     def __getitem__(self, item) -> Union[Sentence, List[Sentence]]:
@@ -68,6 +71,7 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     def load_index(self):
         """Loads the corpus data and indexes the term definitions."""
         if not self._index:
+            self._size = 0
             for definition in tqdm(self, desc="Loading data"):
                 term = definition.annotations["definiendum"]
                 if (term not in self._index):
@@ -111,8 +115,6 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
         return wiktdef
 
 
-
-
 class WiktionaryDefinitionCorpusIterator:
     def __init__(self, wiktc: WiktionaryDefinitionCorpus):
         self._wiktc = wiktc
@@ -124,23 +126,46 @@ class WiktionaryDefinitionCorpusIterator:
     def sent_generator(self):
         with jsonlines.Reader(self._wiktc._source) as reader:
             for term in reader:
-                for lang in self._wiktc.langs:
-                    for pos in term["langs"][lang]["meanings"]:
-                        for meaning in term["langs"][lang]["meanings"][pos]:
-                            sentence = Sentence()
-                            sentence.annotations["definiendum"] = term["title"].strip()
-                            sentence.annotations["definition_pos"] = pos
-                            definition = meaning["meaning"].replace("</text>", "").strip()
-                            sentence.surface = definition
-                            for tok in self._wiktc.tokenizer(definition):
-                                token = Token()
-                                token.surface = tok.text
-                                sentence.tokens.append(token)
+                if ("word" in term and term["lang"] in self._wiktc.langs):
+                    for sense in term["senses"]:
+                        if ("glosses" in sense):
+                            for gloss in sense["glosses"]:
+                                sentence = Sentence()
+                                sentence.annotations["definiendum"] = term["word"]
+                                sentence.annotations["definition_pos"] = term["pos"]
+                                if ("tags" in sense):
+                                    sentence.annotations["tags"] = sense["tags"]
+                                # if ("categories" in sense):
+                                #     sentence.annotations["categories"] = [ct for ct in sense["categories"] if ":" in ct]
+                                definition = gloss
+                                sentence.surface = definition
+                                for tok in self._wiktc.tokenizer(definition):
+                                    token = Token()
+                                    token.surface = tok.text
+                                    sentence.tokens.append(token)
 
-                            if (len(sentence.tokens) == 0):
-                                continue
+                                if (len(sentence.tokens) == 0):
+                                    continue
 
-                            yield sentence
+                                yield sentence
+
+                # for lang in self._wiktc.langs:
+                #     for pos in term["langs"][lang]["meanings"]:
+                #         for meaning in term["langs"][lang]["meanings"][pos]:
+                #             sentence = Sentence()
+                #             sentence.annotations["definiendum"] = term["title"].strip()
+                #             sentence.annotations["definition_pos"] = pos
+                #             definition = meaning["meaning"].replace("</text>", "").strip()
+                #             sentence.surface = definition
+                #             for tok in self._wiktc.tokenizer(definition):
+                #                 token = Token()
+                #                 token.surface = tok.text
+                #                 sentence.tokens.append(token)
+                #
+                #             if (len(sentence.tokens) == 0):
+                #                 continue
+                #
+                #             yield sentence
 
 
 if __name__ == "__main__":
