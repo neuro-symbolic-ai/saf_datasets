@@ -35,13 +35,14 @@ class EntailmentBankDataSet(SentenceDataSet):
                             sentence.annotations["split"] = split
                             sentence.annotations["id"] = entry["id"]
                             sentence.annotations["type"] = feat
-                            sentence.surface = features[feat]
+                            sentence.surface = features[feat] if features[feat] else ""
                             for tok in self.tokenizer(sentence.surface):
                                 token = Token()
                                 token.surface = tok.text
                                 sentence.tokens.append(token)
 
-                            self.data.append(sentence)
+                            if (sentence.surface):
+                                self.data.append(sentence)
 
     def __iter__(self):
         return iter(self.data)
