@@ -16,8 +16,8 @@ def load_requirements() -> list:
 
 setup(
     name='saf_datasets',
-    version='0.4.2',
-    packages=['saf_datasets', 'saf_datasets.annotators', 'saf_datasets.data_access'],
+    version='0.4.3',
+    packages=['saf_datasets', 'saf_datasets.annotators', 'saf_datasets.data_access', 'saf_datasets.wrappers'],
     url='',
     license='GNU General Public License v3.0',
     author='Danilo S. Carvalho',
