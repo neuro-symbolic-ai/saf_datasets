@@ -14,6 +14,10 @@ ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
         "path": "wiktionary/wikdef_spacy_dsr.pickle.gz",
         "url": "https://drive.google.com/uc?id=1FuBr2LIljV1s29Zik0v81YA3eaws1Cf2"
+    },
+    "pos+lemma+ctag+dep+dsr#sample": {
+        "path": "wiktionary/wikdef_spacy_dsr_sample.pickle.gz",
+        "url": "https://drive.google.com/uc?id=1dlCn_3nW6efcfc4zYMuG6W_LDcahDQzq"
     }
 }
 
@@ -103,7 +107,7 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
             with gzip.open(data_path, "rb") as resource_file:
                 data = pickle.load(resource_file)
 
-            wiktdef = WiktionaryDefinitionCorpus()
+            wiktdef = WiktionaryDefinitionCorpus(url="")
             for definition in tqdm(data, desc=f"Loading data from resource: {locator}"):
                 term = definition.annotations["definiendum"]
                 if (term not in wiktdef._index):

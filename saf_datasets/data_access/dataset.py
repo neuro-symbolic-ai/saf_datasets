@@ -18,7 +18,7 @@ class SentenceDataSet(Iterable[Sentence]):
         self._vocab: Dict[str, Vocabulary] = dict()
         self._embeddings: Dict[str, Tensor] = dict()
         self._emb_indices: Dict[str, Tensor] = dict()
-        if (not os.path.exists(self.data_path)):
+        if (not os.path.exists(self.data_path) and url):
             os.makedirs(os.path.join(*os.path.split(self.data_path)[:-1]), exist_ok=True)
             gdown.download(url, self.data_path)
 
