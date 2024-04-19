@@ -1,14 +1,21 @@
 import gzip
 import jsonlines
+import pickle
 from tqdm import tqdm
 from saf import Token
 from saf import Sentence, Vocabulary
 from .dataset import SentenceDataSet
 from .wiktionary import WiktionaryDefinitionCorpus
 
-
 PATH = "WordNet/WordNet_filtered_data.jsonl.gz"
 URL = "https://drive.google.com/uc?id=1v6UpPjbJ_QnsFZNCJQ0avB6yxjfhKime"
+
+ANNOT_RESOURCES = {
+    "pos+lemma+ctag+dep+dsr+srl": {
+        "path": "WordNet/wordnet_filtered_spacy_dsr_srl.pickle.gz",
+        "url": "https://drive.google.com/uc?id=1RuYJCvXz0iDQId-7RvMKP5z56SNQSdWM"
+    }
+}
 
 
 class WordNetFilteredDataSet(SentenceDataSet):
@@ -59,6 +66,19 @@ class WordNetFilteredDataSet(SentenceDataSet):
         return WiktionaryDefinitionCorpus.vocabulary(self, source, lowercase)
 
 
+    @staticmethod
+    def from_resource(locator: str):
+        dataset = None
+        if (locator in ANNOT_RESOURCES):
+            path = ANNOT_RESOURCES[locator]["path"]
+            url = ANNOT_RESOURCES[locator]["url"]
+            data_path = WiktionaryDefinitionCorpus.download_resource(path, url)
+            with gzip.open(data_path, "rb") as resource_file:
+                dataset = pickle.load(resource_file)
+        else:
+            print(f"No resource found at locator: {locator}")
+
+        return dataset
 
 
 

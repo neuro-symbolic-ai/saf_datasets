@@ -10,11 +10,11 @@ class SpacyAnnotator(Annotator):
         super(SpacyAnnotator, self).__init__()
         self.annot_model = spacy.load(annot_model)
 
-    def annotate(self, definitions: Iterable[Sentence]):
-        for defn in tqdm(definitions, desc="Annotating (Spacy)"):
-            annots = self.annot_model(defn.surface)
-            for i in range(len(defn.tokens)):
-                defn.tokens[i].annotations["pos"] = annots[i].pos_
-                defn.tokens[i].annotations["lemma"] = annots[i].lemma_
-                defn.tokens[i].annotations["dep"] = annots[i].dep_
-                defn.tokens[i].annotations["ctag"] = annots[i].tag_
+    def annotate(self, sentences: Iterable[Sentence]):
+        for sent in tqdm(sentences, desc="Annotating (Spacy)"):
+            annots = self.annot_model(sent.surface)
+            for i in range(len(sent.tokens)):
+                sent.tokens[i].annotations["pos"] = annots[i].pos_
+                sent.tokens[i].annotations["lemma"] = annots[i].lemma_
+                sent.tokens[i].annotations["dep"] = annots[i].dep_
+                sent.tokens[i].annotations["ctag"] = annots[i].tag_

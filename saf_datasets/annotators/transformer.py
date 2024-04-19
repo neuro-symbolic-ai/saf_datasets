@@ -39,10 +39,10 @@ class TransformerAnnotator(Annotator):
         self.ids_to_labels = labels if labels else self.annot_config.id2label
         self.max_len = max_len
 
-    def annotate(self, definitions: Iterable[Sentence]):
-        for defn in tqdm(definitions, desc="Annotating (Transformer)"):
+    def annotate(self, sentences: Iterable[Sentence]):
+        for sent in tqdm(sentences, desc="Annotating (Transformer)"):
             #tag each definition
-            sentence = defn.surface
+            sentence = sent.surface
             inputs = self.annot_tokenizer(sentence.strip().split(),
                                           is_split_into_words=True,
                                           return_offsets_mapping=True,
@@ -70,12 +70,12 @@ class TransformerAnnotator(Annotator):
                     continue
             word_tags = [[word, label] for word, label in zip(sentence.split(), prediction)]
             #mapping back to the original tokens via string matching
-            for i in range(len(defn.tokens)):
-                if defn.tokens[i].surface.isalnum():
+            for i in range(len(sent.tokens)):
+                if sent.tokens[i].surface.isalnum():
                     for j in range(len(word_tags)):
-                        if defn.tokens[i].surface in word_tags[j][0]:
-                            word_tags[j][0] = word_tags[j][0].replace(defn.tokens[i].surface,"")
-                            defn.tokens[i].annotations["dsr"] = word_tags[j][1]
+                        if sent.tokens[i].surface in word_tags[j][0]:
+                            word_tags[j][0] = word_tags[j][0].replace(sent.tokens[i].surface,"")
+                            sent.tokens[i].annotations["dsr"] = word_tags[j][1]
                             break
                 else:
-                    defn.tokens[i].annotations["dsr"] = "O"
+                    sent.tokens[i].annotations["dsr"] = "O"
