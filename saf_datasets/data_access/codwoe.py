@@ -9,14 +9,17 @@ from spacy.lang.en import English
 from torch import Tensor
 from saf import Sentence, Token
 from saf_datasets.annotators.spacy import SpacyAnnotator
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 
 PATH = "CODWOE/CODWOE.tar"
-URL = "https://drive.google.com/uc?id=1HlDQLUDrJmLzCEPipZMvXYVLebHbLHNT"
+URL = BASE_URL + "CODWOE.tar"
 
 
 class CODWOEDataSet(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("en",)):
+        """
+        Wrapper for the CODWOE dataset from Semeval-2022 Task 1 (Mickus et al. 2022): https://github.com/TimotheeMickus/codwoe
+        """
         super(CODWOEDataSet, self).__init__(path, url)
         TarFile.open(self.data_path).extractall(os.path.join(*self.data_path.split(os.sep)[:-2]))
         path = os.path.join(*self.data_path.split(os.sep)[:-1])

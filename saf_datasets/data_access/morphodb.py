@@ -2,10 +2,10 @@ import json
 import bz2
 from saf import Sentence
 from saf.importers.morphodb import MorphoDBImporter
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 
 PATH = "morphodb/enmorphodb.json.bz2"
-URL = "https://drive.google.com/uc?id=1s1Ic6KR-pZF7fdmyQxyg9OjuTn4AIfcX"
+URL = BASE_URL + "enmorphodb.json.bz2"
 
 
 class MorphoDecompDataSet(SentenceDataSet):

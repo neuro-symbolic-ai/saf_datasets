@@ -11,6 +11,11 @@ URL = "https://sbert.net/datasets/AllNLI.tsv.gz"
 
 
 class AllNLIDataSet(SentenceDataSet):
+    """
+    Wrapper for the AllNLI dataset: https://www.sbert.net/examples/datasets/README.html
+
+    Sentence annotations: id, dataset, split, label
+    """
     def __init__(self, path: str = PATH, url: str = URL):
         super(AllNLIDataSet, self).__init__(path, url)
         self.tokenizer = English().tokenizer

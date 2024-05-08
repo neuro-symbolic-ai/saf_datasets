@@ -13,6 +13,15 @@ from .models import PRETRAINED_MODELS
 BASE_PATH = ".saf_models"
 
 class TransformerAnnotator(Annotator):
+    """
+    Annotator class for general transformer-based annotation (token classification) models
+
+    Args:
+        annot_model (str): the path or identifier for a pretrained model checkpoint.
+        labels (Dict[int, str]): valid labels and their corresponding values (ids).
+        max_len (int): maximum sentence length.
+        device (str): device (e.g., 'cpu', 'cuda') where the model will be stored and ran.
+    """
     def __init__(self, annot_model: str, labels: Dict[int, str] = None, max_len: int = 128, device: str = None):
         super(TransformerAnnotator, self).__init__()
         if (not device):

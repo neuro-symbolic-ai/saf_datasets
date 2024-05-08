@@ -6,6 +6,9 @@ from saf.annotators import Annotator
 
 
 class AllenSRLAnnotator(Annotator):
+    """
+    Annotator class for Semantic Role Labelling, based on the AllenNLP SRL model (Argument Structure)
+    """
     def __init__(self, annot_model: str = "en_core_web_sm"):
         super(AllenSRLAnnotator, self).__init__()
         self.annot_model = pretrained.load_predictor("structured-prediction-srl-bert")

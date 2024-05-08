@@ -1,0 +1,29 @@
+[project]
+name = "saf-datasets"
+version = "0.6.0"
+authors = [
+  { name="Danilo S. Carvalho", email="danilo.carvalho@manchester.ac.uk" }
+]
+description = "Data set loading and annotation facilities for the Simple Annotation Framework"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+keywords = ["datasets", "annotated", "nlp"]
+dependencies = [
+    "saf-nlp",
+    "spacy",
+    "gdown",
+    "tqdm",
+    "torch",
+    "jsonlines",
+    "transformers",
+    "sentencepiece",
+    "protobuf"
+]
+
+[project.urls]
+Homepage = "https://github.com/neuro-symbolic-ai/saf_datasets"
+Issues = "https://github.com/neuro-symbolic-ai/saf_datasets/issues"

@@ -18,5 +18,6 @@ def gen(dataset: SentenceDataSet):
 
 
 def to_hf(dataset: SentenceDataSet) -> datasets.Dataset:
+    """Returns a HuggingFace datasets.Dataset wrapper for the given SentenceDataSet"""
     return datasets.Dataset.from_generator(gen, gen_kwargs={"dataset": dataset})
 

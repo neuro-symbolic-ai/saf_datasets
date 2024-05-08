@@ -1,4 +1,4 @@
-saf @ git+https://github.com/dscarvalho/saf.git
+saf-nlp
 spacy
 gdown
 tqdm

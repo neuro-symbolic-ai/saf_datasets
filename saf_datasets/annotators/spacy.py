@@ -6,6 +6,13 @@ from saf.annotators import Annotator
 
 
 class SpacyAnnotator(Annotator):
+    """
+        Annotator class for part-of-speech (POS), lemmatization, constituency tree tagging,
+        and dependency grammar tagging, based on the SpaCy library annotation models
+
+        Args:
+            annot_model (str): SpaCy annotation model to be used.
+        """
     def __init__(self, annot_model: str = "en_core_web_sm"):
         super(SpacyAnnotator, self).__init__()
         self.annot_model = spacy.load(annot_model)

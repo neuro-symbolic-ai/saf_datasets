@@ -4,21 +4,35 @@ import pickle
 from tqdm import tqdm
 from saf import Token
 from saf import Sentence, Vocabulary
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 from .wiktionary import WiktionaryDefinitionCorpus
 
 PATH = "WordNet/WordNet_filtered_data.jsonl.gz"
-URL = "https://drive.google.com/uc?id=1v6UpPjbJ_QnsFZNCJQ0avB6yxjfhKime"
+URL = BASE_URL + "WordNet_filtered_data.jsonl.gz"
 
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr+srl": {
         "path": "WordNet/wordnet_filtered_spacy_dsr_srl.pickle.gz",
-        "url": "https://drive.google.com/uc?id=1RuYJCvXz0iDQId-7RvMKP5z56SNQSdWM"
+        "url": BASE_URL + "wordnet_filtered_spacy_dsr_srl.pickle.gz"
     }
 }
 
 
 class WordNetFilteredDataSet(SentenceDataSet):
+    """
+    Wordnet filtered data set: A collection of filtered definition sentences from WordNet
+
+    Each element of this dataset is a definition sentence (gloss) of a single synset, as it appears in WordNet.
+    Definitions were filtered to only include those which definiendum (the term being defined) is representable by
+    a single token from the LLaMa tokenizer.
+    Each sentence is annotated with a "definiendum" and corresponding metadata from WordNet (WordNet id,
+    brown_frequency, wordnet_frequency, category, abstraction_level, generalization_level).
+
+    A pre-annotated instance can be obtained as follows:
+
+    >>> dataset = WordNetFilteredDataSet.from_resource("pos+lemma+ctag+dep+dsr+srl")
+
+    """
     def __init__(self, path: str = PATH, url: str = URL):
         super(WordNetFilteredDataSet, self).__init__(path, url)
 
@@ -68,6 +82,12 @@ class WordNetFilteredDataSet(SentenceDataSet):
 
     @staticmethod
     def from_resource(locator: str):
+        """
+        Downloaads a per-annotated resource available at the specified locator
+
+        Example:
+            >>> dataset = WordNetFilteredDataSet.from_resource("pos+lemma+ctag+dep+dsr+srl")
+        """
         dataset = None
         if (locator in ANNOT_RESOURCES):
             path = ANNOT_RESOURCES[locator]["path"]

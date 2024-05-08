@@ -4,14 +4,22 @@ from zipfile import ZipFile
 from tqdm import tqdm
 from spacy.lang.en import English
 from saf import Sentence, Token
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 
 FILE_VERSION = "entailment_trees_emnlp2021_data_v3"
 PATH = "EntailmentBank/%s.zip" % FILE_VERSION
-URL = "https://drive.google.com/uc?id=1laTMVEiR2n1VAEXu1aCq4ndpRqVnW1-R"
+URL = BASE_URL + "%s.zip" % FILE_VERSION
 
 
 class EntailmentBankDataSet(SentenceDataSet):
+    """
+    Wrapper for the EntailmentBank dataset: https://allenai.org/data/entailmentbank
+
+    Context, hypothesis, question, answer and proof sentences for a single entry in the original dataset are split
+    adjacently, and can be grouped by their 'id' annotation.
+
+    Sentence annotations: id, task, split, type
+    """
     def __init__(self, path: str = PATH, url: str = URL):
         super(EntailmentBankDataSet, self).__init__(path, url)
         self.tokenizer = English().tokenizer

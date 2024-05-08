@@ -7,6 +7,16 @@ from saf import Sentence
 
 
 class TokenizedDataSet(Dataset):
+    """
+    A wrapper class for acessing a collection of Sentence objects or a list of strings as a torch.utils.data.Dataset
+
+
+    Args:
+        source (Union[Iterable[Sentence], List[str]]): a iterable of SAF Sentence objects (e.g., SentenceDataSet) or list of strings.
+        tokenizer (PreTrainedTokenizer): tokenizer object to be used for tokenizing the sentences.
+        max_len (int): maximum sentence length.
+        one_hot (bool): whether the token ids will be one-hot encoded in the sentence tensors.
+    """
     def __init__(self,  source: Union[Iterable[Sentence], List[str]],
                  tokenizer: PreTrainedTokenizer,
                  max_len: int,

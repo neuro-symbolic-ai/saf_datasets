@@ -6,23 +6,34 @@ from tqdm import tqdm
 from spacy.lang.en import English
 from saf import Sentence, Token, Vocabulary
 from saf_datasets.annotators.spacy import SpacyAnnotator
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 
 PATH = "wiktionary/raw-wiktextract-data_2024-01-20.jsonl.gz"  # From https://kaikki.org/dictionary/rawdata.html
 URL = "https://drive.google.com/uc?id=1ZMZe25lhjl14p0kEJVxedwmMZV2KUBrz"
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
         "path": "wiktionary/wikdef_spacy_dsr.pickle.gz",
-        "url": "https://drive.google.com/uc?id=1FuBr2LIljV1s29Zik0v81YA3eaws1Cf2"
+        "url": BASE_URL + "wikdef_spacy_dsr.pickle.gz"
     },
     "pos+lemma+ctag+dep+dsr#sample": {
         "path": "wiktionary/wikdef_spacy_dsr_sample.pickle.gz",
-        "url": "https://drive.google.com/uc?id=1dlCn_3nW6efcfc4zYMuG6W_LDcahDQzq"
+        "url": BASE_URL + "wikdef_spacy_dsr_sample.pickle.gz"
     }
 }
 
 
 class WiktionaryDefinitionCorpus(SentenceDataSet):
+    """
+    Wiktionary definition corpus: A collection of definition sentences from Wiktionary
+
+    Each element of this dataset is a definition sentence (gloss) of a single sense, as it appears in Wiktionary.
+    Each sentence is annotated with a "definiendum" (the term being defined) and its corresponding part-of-speech (definition_pos).
+
+    A pre-annotated instance can be obtained as follows:
+
+    >>> dataset = WiktionaryDefinitionCorpus.from_resource("pos+lemma+ctag+dep+dsr")
+
+    """
     def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",)):
         super(WiktionaryDefinitionCorpus, self).__init__(path, url)
         self._source = gzip.open(self.data_path)
@@ -99,6 +110,12 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
 
     @staticmethod
     def from_resource(locator: str):
+        """
+        Downloaads a per-annotated resource available at the specified locator
+
+        Example:
+            >>> dataset = WiktionaryDefinitionCorpus.from_resource("pos+lemma+ctag+dep+dsr")
+        """
         wiktdef = None
         if (locator in ANNOT_RESOURCES):
             path = ANNOT_RESOURCES[locator]["path"]

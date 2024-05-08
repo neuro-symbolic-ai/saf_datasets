@@ -5,14 +5,17 @@ from spacy.lang.en import English
 from saf import Sentence, Token
 from saf_datasets.annotators.spacy import SpacyAnnotator
 from saf import Sentence, Vocabulary
-from .dataset import SentenceDataSet
+from .dataset import SentenceDataSet, BASE_URL
 from .wiktionary import WiktionaryDefinitionCorpus
 
 PATH = "CPAE/cpae_definitions.csv.bz2"
-URL = "https://drive.google.com/uc?id=16B8hVf5NkubN4G_J_SrryA6A8YoxEZLP"
+URL = BASE_URL + "cpae_definitions.csv.bz2"
 
 
 class CPAEDataSet(SentenceDataSet):
+    """
+    Wrapper for the CPAE dataset (Bosc, Vincent. 2018): https://aclanthology.org/D18-1181/
+    """
     def __init__(self, path: str = PATH, url: str = URL):
         super(CPAEDataSet, self).__init__(path, url)
         self.tokenizer = English().tokenizer
