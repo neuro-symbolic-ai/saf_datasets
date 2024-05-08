@@ -16,10 +16,9 @@ def load_requirements() -> list:
 
 setup(
     name='saf_datasets',
-    version='0.6.0',
+    version='0.6.1',
     packages=['saf_datasets', 'saf_datasets.annotators', 'saf_datasets.data_access', 'saf_datasets.wrappers'],
     url='',
-    license='GNU General Public License v3.0',
     author='Danilo S. Carvalho',
     author_email='danilo.carvalho@manchester.ac.uk',
     description='Data set loading and annotation facilities for the Simple Annotation Framework',

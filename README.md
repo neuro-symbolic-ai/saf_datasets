@@ -16,7 +16,7 @@ It also provides annotator classes to automatically label existing and new datas
 
 ## Installation
 
-To install SAF, you can use pip:
+To install, you can use pip:
 
 ```bash
 pip install saf-datasets

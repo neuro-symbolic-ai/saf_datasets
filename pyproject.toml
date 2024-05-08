@@ -1,6 +1,6 @@
 [project]
 name = "saf-datasets"
-version = "0.6.0"
+version = "0.6.1"
 authors = [
   { name="Danilo S. Carvalho", email="danilo.carvalho@manchester.ac.uk" }
 ]
@@ -12,17 +12,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 keywords = ["datasets", "annotated", "nlp"]
-dependencies = [
-    "saf-nlp",
-    "spacy",
-    "gdown",
-    "tqdm",
-    "torch",
-    "jsonlines",
-    "transformers",
-    "sentencepiece",
-    "protobuf"
-]
+dynamic = ["dependencies"]
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.urls]
 Homepage = "https://github.com/neuro-symbolic-ai/saf_datasets"
