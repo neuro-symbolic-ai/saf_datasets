@@ -18,11 +18,12 @@ class TransformerAnnotator(Annotator):
 
     Args:
         annot_model (str): the path or identifier for a pretrained model checkpoint.
+        tag (str): the annotation tag to which the annotations will be stored (e.g., NER, SRL, DSR).
         labels (Dict[int, str]): valid labels and their corresponding values (ids).
         max_len (int): maximum sentence length.
         device (str): device (e.g., 'cpu', 'cuda') where the model will be stored and ran.
     """
-    def __init__(self, annot_model: str, labels: Dict[int, str] = None, max_len: int = 128, device: str = None):
+    def __init__(self, annot_model: str, tag: str, labels: Dict[int, str] = None, max_len: int = 128, device: str = None):
         super(TransformerAnnotator, self).__init__()
         if (not device):
             if (cuda.is_available()):
@@ -47,6 +48,7 @@ class TransformerAnnotator(Annotator):
         self.annot_config = AutoConfig.from_pretrained(annot_model)
         self.ids_to_labels = labels if labels else self.annot_config.id2label
         self.max_len = max_len
+        self.tag = tag
 
     def annotate(self, sentences: Iterable[Sentence]):
         for sent in tqdm(sentences, desc="Annotating (Transformer)"):
@@ -84,7 +86,7 @@ class TransformerAnnotator(Annotator):
                     for j in range(len(word_tags)):
                         if sent.tokens[i].surface in word_tags[j][0]:
                             word_tags[j][0] = word_tags[j][0].replace(sent.tokens[i].surface,"")
-                            sent.tokens[i].annotations["dsr"] = word_tags[j][1]
+                            sent.tokens[i].annotations[self.tag] = word_tags[j][1]
                             break
                 else:
-                    sent.tokens[i].annotations["dsr"] = "O"
+                    sent.tokens[i].annotations[self.tag] = "O"
