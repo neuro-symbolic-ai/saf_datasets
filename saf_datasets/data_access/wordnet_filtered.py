@@ -92,7 +92,7 @@ class WordNetFilteredDataSet(SentenceDataSet):
         if (locator in ANNOT_RESOURCES):
             path = ANNOT_RESOURCES[locator]["path"]
             url = ANNOT_RESOURCES[locator]["url"]
-            data_path = WiktionaryDefinitionCorpus.download_resource(path, url)
+            data_path = SentenceDataSet.download_resource(path, url)
             with gzip.open(data_path, "rb") as resource_file:
                 dataset = pickle.load(resource_file)
         else:

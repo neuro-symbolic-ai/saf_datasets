@@ -1,5 +1,7 @@
 import os
+import pickle
 import jsonlines
+import gzip
 from zipfile import ZipFile
 from tqdm import tqdm
 from spacy.lang.en import English
@@ -9,6 +11,13 @@ from .dataset import SentenceDataSet, BASE_URL
 FILE_VERSION = "entailment_trees_emnlp2021_data_v3"
 PATH = "EntailmentBank/%s.zip" % FILE_VERSION
 URL = BASE_URL + "%s.zip" % FILE_VERSION
+
+ANNOT_RESOURCES = {
+    "pos+lemma+ctag+dep+srl#noproof": {
+        "path": "EntailmentBank/eb_spacy_srl_noproof.pickle.gz",
+        "url": BASE_URL + "eb_spacy_srl_noproof.pickle.gz"
+    }
+}
 
 
 class EntailmentBankDataSet(SentenceDataSet):
@@ -67,4 +76,25 @@ class EntailmentBankDataSet(SentenceDataSet):
         :return: A single term decomposition (Sentence).
         """
         return self.data[idx]
+
+    @staticmethod
+    def from_resource(locator: str):
+        """
+        Downloaads a per-annotated resource available at the specified locator
+
+        Example:
+            >>> dataset = EntailmentBankDataSet.from_resource("pos+lemma+ctag+dep+srl#noproof")
+        """
+        dataset = None
+        if (locator in ANNOT_RESOURCES):
+            path = ANNOT_RESOURCES[locator]["path"]
+            url = ANNOT_RESOURCES[locator]["url"]
+            data_path = SentenceDataSet.download_resource(path, url)
+            dataset = EntailmentBankDataSet(url="")
+            with gzip.open(data_path, "rb") as resource_file:
+                dataset.data = pickle.load(resource_file)
+        else:
+            print(f"No resource found at locator: {locator}")
+
+        return dataset
 
