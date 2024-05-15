@@ -9,6 +9,7 @@ from .dataset import SentenceDataSet, BASE_URL
 PATH = "WordNet/Spanish_WordNet_filtered_data.jsonl.gz"
 URL = BASE_URL + "Spanish_WordNet_filtered_data.jsonl.gz"
 
+
 class SpanishWordNetFilteredDataSet(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL):
         super(SpanishWordNetFilteredDataSet, self).__init__(path, url)
