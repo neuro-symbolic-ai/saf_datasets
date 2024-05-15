@@ -35,6 +35,8 @@ class WordNetFilteredDataSet(SentenceDataSet):
     """
     def __init__(self, path: str = PATH, url: str = URL):
         super(WordNetFilteredDataSet, self).__init__(path, url)
+        if (not url):
+            return
 
         with gzip.open(self.data_path) as dataset_file:
             with jsonlines.Reader(dataset_file) as reader:

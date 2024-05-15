@@ -32,6 +32,8 @@ class EntailmentBankDataSet(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL):
         super(EntailmentBankDataSet, self).__init__(path, url)
         self.tokenizer = English().tokenizer
+        if (not url):
+            return
 
         with ZipFile(self.data_path) as dataset_file:
             self.data = list()

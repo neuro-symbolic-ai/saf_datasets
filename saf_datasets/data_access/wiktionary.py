@@ -36,6 +36,9 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     """
     def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",)):
         super(WiktionaryDefinitionCorpus, self).__init__(path, url)
+        if (not url):
+            return
+
         self._source = gzip.open(self.data_path)
         self._size: int = -1
         self.langs: Tuple[str] = langs
