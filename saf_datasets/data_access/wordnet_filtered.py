@@ -20,7 +20,7 @@ ANNOT_RESOURCES = {
 
 class WordNetFilteredDataSet(SentenceDataSet):
     """
-    Wordnet filtered data set: A collection of filtered definition sentences from WordNet
+    WordNet filtered data set: A collection of filtered definition sentences from WordNet
 
     Each element of this dataset is a definition sentence (gloss) of a single synset, as it appears in WordNet.
     Definitions were filtered to only include those which definiendum (the term being defined) is representable by
