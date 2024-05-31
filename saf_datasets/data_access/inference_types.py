@@ -74,7 +74,7 @@ class InferenceTypesDataSet(SentenceDataSet):
     @staticmethod
     def from_resource(locator: str):
         """
-        Downloaads a per-annotated resource available at the specified locator
+        Downloads a pre-annotated resource available at the specified locator
 
         Example:
             >>> dataset = InferenceTypesDataSet.from_resource("pos+lemma+ctag+dep+amr")
@@ -84,7 +84,6 @@ class InferenceTypesDataSet(SentenceDataSet):
             path = ANNOT_RESOURCES[locator]["path"]
             url = ANNOT_RESOURCES[locator]["url"]
             data_path = SentenceDataSet.download_resource(path, url)
-            dataset = InferenceTypesDataSet(url="")
             with gzip.open(data_path, "rb") as resource_file:
                 dataset = pickle.load(resource_file)
         else:

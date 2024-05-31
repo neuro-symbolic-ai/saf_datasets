@@ -82,7 +82,7 @@ class EntailmentBankDataSet(SentenceDataSet):
     @staticmethod
     def from_resource(locator: str):
         """
-        Downloaads a per-annotated resource available at the specified locator
+        Downloads a pre-annotated resource available at the specified locator
 
         Example:
             >>> dataset = EntailmentBankDataSet.from_resource("pos+lemma+ctag+dep+srl#noproof")

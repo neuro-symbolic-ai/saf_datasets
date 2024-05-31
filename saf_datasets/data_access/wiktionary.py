@@ -114,7 +114,7 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     @staticmethod
     def from_resource(locator: str):
         """
-        Downloaads a per-annotated resource available at the specified locator
+        Downloads a pre-annotated resource available at the specified locator
 
         Example:
             >>> dataset = WiktionaryDefinitionCorpus.from_resource("pos+lemma+ctag+dep+dsr")
