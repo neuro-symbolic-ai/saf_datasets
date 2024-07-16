@@ -12,12 +12,12 @@ PATH = "wiktionary/raw-wiktextract-data_2024-01-20.jsonl.gz"  # From https://kai
 URL = "https://drive.google.com/uc?id=1ZMZe25lhjl14p0kEJVxedwmMZV2KUBrz"
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
-        "path": "wiktionary/wikdef_spacy_dsr.pickle.gz",
-        "url": BASE_URL + "wikdef_spacy_dsr.pickle.gz"
+        "path": "wiktionary/wiktdef_spacy_dsr.pickle.gz",
+        "url": BASE_URL + "wiktdef_spacy_dsr.pickle.gz"
     },
     "pos+lemma+ctag+dep+dsr#sample": {
-        "path": "wiktionary/wikdef_spacy_dsr_sample.pickle.gz",
-        "url": BASE_URL + "wikdef_spacy_dsr_sample.pickle.gz"
+        "path": "wiktionary/wiktdef_spacy_dsr_sample.pickle.gz",
+        "url": BASE_URL + "wiktdef_spacy_dsr_sample.pickle.gz"
     }
 }
 
