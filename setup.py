@@ -16,7 +16,7 @@ def load_requirements() -> list:
 
 setup(
     name='saf_datasets',
-    version='0.6.9',
+    version='0.6.10',
     packages=['saf_datasets', 'saf_datasets.annotators', 'saf_datasets.data_access', 'saf_datasets.wrappers'],
     url='',
     author='Danilo S. Carvalho',
