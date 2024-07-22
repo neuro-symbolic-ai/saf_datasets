@@ -1,9 +1,7 @@
-import os
 import bz2
 from tqdm import tqdm
 from spacy.lang.en import English
 from saf import Sentence, Token
-from saf_datasets.annotators.spacy import SpacyAnnotator
 from saf import Sentence, Vocabulary
 from .dataset import SentenceDataSet, BASE_URL
 from .wiktionary import WiktionaryDefinitionCorpus
