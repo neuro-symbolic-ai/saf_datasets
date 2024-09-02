@@ -5,3 +5,5 @@ from .data_access.allnli import AllNLIDataSet
 from .data_access.stsb import STSBDataSet
 from .data_access.entailmentbank import EntailmentBankDataSet
 from .data_access.wordnet_filtered import WordNetFilteredDataSet
+from .data_access.wordnet_formalised import WordNetFormalisedDataSet
+from .data_access.wordnet_spanish import SpanishWordNetFilteredDataSet
