@@ -6,15 +6,19 @@ from saf import Sentence, Vocabulary
 from .dataset import SentenceDataSet, BASE_URL
 
 
-PATH = "WordNet/Spanish_WordNet_filtered_data.jsonl.gz"
-URL = BASE_URL + "Spanish_WordNet_filtered_data.jsonl.gz"
+# PATH = "WordNet/Spanish_WordNet_filtered_data.jsonl.gz"
+# URL = BASE_URL + "Spanish_WordNet_filtered_data.jsonl.gz"
+PATH = "/Users/user/Desktop/Code/saf_datasets/Spanish_WordNet_filtered_data_2.jsonl.gz"
+URL = "/Users/user/Desktop/Code/saf_datasets/Spanish_WordNet_filtered_data_2.jsonl.gz"
 
 
 class SpanishWordNetFilteredDataSet(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL):
         super(SpanishWordNetFilteredDataSet, self).__init__(path, url)
         with gzip.open(self.data_path, 'rt') as dataset_file:
+            print('path', self.data_path)
             with jsonlines.Reader(dataset_file) as reader:
+
                 self.data = list()
                 for line in tqdm(reader, desc="Loading WordNet filtered data"):
                     sentence = Sentence()
@@ -53,3 +57,5 @@ class SpanishWordNetFilteredDataSet(SentenceDataSet):
         :return: A single term definition (Sentence).
         """
         return self.data[idx]
+
+w = SpanishWordNetFilteredDataSet()
