@@ -32,6 +32,7 @@ class SentenceDataSet(Iterable[Sentence]):
         self._vocab: Dict[str, Vocabulary] = dict()
         self._embeddings: Dict[str, Tensor] = dict()
         self._emb_indices: Dict[str, Tensor] = dict()
+        self._annotations: Dict[str, List[str]] = dict()
         if (not os.path.exists(self.data_path) and url):
             os.makedirs(os.path.join(*os.path.split(self.data_path)[:-1]), exist_ok=True)
             gdown.download(url, self.data_path)
@@ -82,6 +83,21 @@ class SentenceDataSet(Iterable[Sentence]):
         """
         vocab = self.vocabulary(source)
         vocab.del_symbols(symbols)
+
+    def annotations(self) -> Dict[str, List[str]]:
+        if (not self._annotations):
+            annot = self[0].tokens[0].annotations
+            for key in annot:
+                self._annotations[key] = list()
+                if (isinstance(annot[key], list)):
+                    for sent in self:
+                        for token in sent.tokens:
+                            self._annotations[key].extend(set(token.annotations[key]))
+                    self._annotations[key] = sorted(set(self._annotations[key]))
+                else:
+                    self._annotations[key] = sorted(self.vocabulary(key).symbols)
+
+        return self._annotations
 
     def to_indices(self, source: str = "_token", default: int = -1, padding: int = 0, pad_symbol: str = None,
                    start_symbol: str = None, end_symbol: str = None) -> Tensor:
