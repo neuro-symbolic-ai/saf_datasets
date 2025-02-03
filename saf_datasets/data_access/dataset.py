@@ -95,7 +95,7 @@ class SentenceDataSet(Iterable[Sentence]):
                             self._annotations[key].extend(set(token.annotations[key]))
                     self._annotations[key] = sorted(set(self._annotations[key]))
                 else:
-                    self._annotations[key] = sorted(self.vocabulary(key).symbols)
+                    self._annotations[key] = sorted(self.vocabulary(key, lowercase=False).symbols)
 
         return self._annotations
 
