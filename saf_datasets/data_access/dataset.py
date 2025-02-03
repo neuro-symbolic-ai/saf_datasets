@@ -84,6 +84,7 @@ class SentenceDataSet(Iterable[Sentence]):
         vocab = self.vocabulary(source)
         vocab.del_symbols(symbols)
 
+    @property
     def annotations(self) -> Dict[str, List[str]]:
         if (not self._annotations):
             annot = self[0].tokens[0].annotations

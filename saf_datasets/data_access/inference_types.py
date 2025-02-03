@@ -6,14 +6,14 @@ from spacy.lang.en import English
 from saf import Sentence, Token
 from .dataset import SentenceDataSet, BASE_URL
 
-FILE_VERSION = "tr_data_type_amr_op_v0.2"
+FILE_VERSION = "tr_data_type_amr_op_v0.3"
 PATH = "InferenceTypes/%s.csv.gz" % FILE_VERSION
 URL = BASE_URL + "%s.csv.gz" % FILE_VERSION
 
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+amr": {
-        "path": "InferenceTypes/inftypes_v0.2.pickle.gz",
-        "url": BASE_URL + "inftypes_v0.2.pickle.gz"
+        "path": "InferenceTypes/inftypes_v0.3.pickle.gz",
+        "url": BASE_URL + "inftypes_v0.3.pickle.gz"
     }
 }
 
