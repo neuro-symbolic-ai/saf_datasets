@@ -1,6 +1,6 @@
 [project]
 name = "saf-datasets"
-version = "0.6.14"
+version = "0.6.15"
 authors = [
   { name="Danilo S. Carvalho", email="danilo.carvalho@manchester.ac.uk" }
 ]

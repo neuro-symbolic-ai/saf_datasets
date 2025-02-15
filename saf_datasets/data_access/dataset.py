@@ -292,7 +292,19 @@ class SentenceDataSet(Iterable[Sentence]):
         return data_path
 
 
+class BasicSentenceDataSet(SentenceDataSet):
+    def __init__(self, sentences: List[Sentence]):
+        super().__init__("", "")
+        self.data = sentences
 
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx: int) -> Sentence:
+        return self.data[idx]
 
 
 

@@ -1,3 +1,4 @@
+from .dataset import SentenceDataSet, BasicSentenceDataSet
 from .wiktionary import WiktionaryDefinitionCorpus
 from .codwoe import CODWOEDataSet
 from .cpae import CPAEDataSet
