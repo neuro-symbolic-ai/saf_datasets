@@ -16,6 +16,10 @@ ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+srl#noproof": {
         "path": "EntailmentBank/eb_spacy_srl_noproof.pickle.gz",
         "url": BASE_URL + "eb_spacy_srl_noproof.pickle.gz"
+    },
+    "pos+lemma+ctag+dep+srl#expl_only-noreps": {
+        "path": "EntailmentBank/eb_spacy_srl_explonly_noreps.pickle.gz",
+        "url": BASE_URL + "eb_spacy_srl_explonly_noreps.pickle.gz"
     }
 }
 
