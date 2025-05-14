@@ -2,7 +2,7 @@ import gzip
 import jsonlines
 from tqdm import tqdm
 from saf import Token
-from saf import Sentence, Vocabulary
+from saf import Sentence
 from .dataset import SentenceDataSet, BASE_URL
 
 

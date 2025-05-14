@@ -2,8 +2,7 @@ import gzip
 import jsonlines
 import pickle
 from tqdm import tqdm
-from saf import Token
-from saf import Sentence, Vocabulary
+from saf import Token, Sentence, Vocabulary
 from .dataset import SentenceDataSet, BASE_URL
 from .wiktionary import WiktionaryDefinitionCorpus
 

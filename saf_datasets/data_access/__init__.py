@@ -9,3 +9,6 @@ from .wordnet_filtered import WordNetFilteredDataSet
 from .wordnet_spanish import SpanishWordNetFilteredDataSet
 from .inference_types import InferenceTypesDataSet
 from .complex_sentences import ComplexSentencesDataSet
+from .yelp_st import YelpSTDataSet
+from .snli import SNLIDataSet
+from .yahoo import YahooAnswersDataSet
