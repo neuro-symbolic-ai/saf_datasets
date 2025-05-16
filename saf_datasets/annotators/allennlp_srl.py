@@ -3,6 +3,8 @@ from tqdm import tqdm
 from allennlp_models import pretrained
 from saf import Sentence
 from saf.annotators import Annotator
+from saf_datasets.data_access.dataset import SentenceDataSet
+from .common import AnnotatorException
 
 
 class AllenSRLAnnotator(Annotator):
@@ -14,6 +16,9 @@ class AllenSRLAnnotator(Annotator):
         self.annot_model = pretrained.load_predictor("structured-prediction-srl-bert")
 
     def annotate(self, sentences: Iterable[Sentence]):
+        if (isinstance(sentences, SentenceDataSet) and not sentences.editing):
+            raise AnnotatorException(AnnotatorException.NO_EDIT)
+
         for sent in tqdm(sentences, desc="Annotating (AllenNLP SRL)"):
             annots = self.annot_model.predict(sent.surface)
             sent.tokens = [tok for tok in sent.tokens if (tok.surface.strip())]

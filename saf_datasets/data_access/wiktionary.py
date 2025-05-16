@@ -1,6 +1,7 @@
 import jsonlines
 import pickle
 import gzip
+import pyarrow
 from typing import Tuple, List, Dict, Union
 from tqdm import tqdm
 from spacy.lang.en import English
@@ -12,12 +13,8 @@ PATH = "wiktionary/raw-wiktextract-data_2024-01-20.jsonl.gz"  # From https://kai
 URL = "https://drive.google.com/uc?id=1ZMZe25lhjl14p0kEJVxedwmMZV2KUBrz"
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+dsr": {
-        "path": "wiktionary/wiktdef_spacy_dsr.pickle.gz",
-        "url": BASE_URL + "wiktdef_spacy_dsr.pickle.gz"
-    },
-    "pos+lemma+ctag+dep+dsr#sample": {
-        "path": "wiktionary/wiktdef_spacy_dsr_sample.pickle.gz",
-        "url": BASE_URL + "wiktdef_spacy_dsr_sample.pickle.gz"
+        "path": "wiktionary/wiktdef_en_spacy_dsr.jsonl.bz2",
+        "url": BASE_URL + "wiktdef_en_spacy_dsr.jsonl.bz2"
     }
 }
 
@@ -37,27 +34,33 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",)):
         super(WiktionaryDefinitionCorpus, self).__init__(path, url)
 
-        self._size: int = -1
         self.langs: Tuple[str] = langs
         self._index: Dict[str, List[Sentence]] = dict()
         self._definitions: List[Sentence] = list()
-        self.tokenizer = English().tokenizer
 
-        if (not url):
-            return
+        if (not self._source):
+            self._size: int = -1
+            self.tokenizer = English().tokenizer
 
-        self._source = gzip.open(self.data_path)
-        self._source.seek(0)
+            if (not url):
+                return
+
+            self._source = gzip.open(self.data_path)
+            self._source.seek(0)
 
     def __iter__(self):
-        if (self._index):
+        if (isinstance(self._source, pyarrow.Table)):
+            return super().__iter__()
+        elif (self._index):
             return iter(self._definitions)
         else:
             self._source.seek(0)
             return WiktionaryDefinitionCorpusIterator(self)
 
     def __len__(self):
-        if (self._size == -1):
+        if (isinstance(self._source, pyarrow.Table)):
+            return super().__len__()
+        elif (self._size == -1):
             with jsonlines.Reader(self._source) as reader:
                 for term in tqdm(reader, desc="Checking data"):
                     if ("word" in term and term["lang"] in self.langs):
@@ -75,6 +78,17 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
 
         :return: A single definition (Sentence) or list of definitions.
         """
+        if (isinstance(self._source, pyarrow.Table)):
+            if (isinstance(item, str)):
+                self.load_index()
+                if (item in self._index):
+                    definition = self._index[item]
+                else:
+                    definition = []
+                return definition
+            else:
+                return super().__getitem__(item)
+
         self.load_index()
         definition = None
         if (isinstance(item, str)):
@@ -90,8 +104,9 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     def load_index(self):
         """Loads the corpus data and indexes the term definitions."""
         if not self._index:
+            self.edit()
             self._size = 0
-            for definition in tqdm(self, desc="Loading data"):
+            for definition in self:
                 term = definition.annotations["definiendum"]
                 if (term not in self._index):
                     self._index[term] = list()
@@ -112,8 +127,8 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
 
         return self._vocab[source]
 
-    @staticmethod
-    def from_resource(locator: str):
+    @classmethod
+    def from_resource(cls, locator: str):
         """
         Downloads a pre-annotated resource available at the specified locator
 
@@ -122,20 +137,18 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
         """
         wiktdef = None
         if (locator in ANNOT_RESOURCES):
-            path = ANNOT_RESOURCES[locator]["path"]
-            url = ANNOT_RESOURCES[locator]["url"]
-            data_path = WiktionaryDefinitionCorpus.download_resource(path, url)
-            with gzip.open(data_path, "rb") as resource_file:
-                data = pickle.load(resource_file)
+            wiktdef = cls(**ANNOT_RESOURCES[locator])
+        else:
+            print(f"No resource found at locator: {locator}")
 
-            wiktdef = WiktionaryDefinitionCorpus(url="")
-            for definition in tqdm(data, desc=f"Loading data from resource: {locator}"):
-                term = definition.annotations["definiendum"]
-                if (term not in wiktdef._index):
-                    wiktdef._index[term] = list()
-                wiktdef._index[term].append(definition)
-                wiktdef._definitions.append(definition)
-            wiktdef._size = len(wiktdef._definitions)
+            # wiktdef = WiktionaryDefinitionCorpus(url="")
+            # for definition in tqdm(data, desc=f"Loading data from resource: {locator}"):
+            #     term = definition.annotations["definiendum"]
+            #     if (term not in wiktdef._index):
+            #         wiktdef._index[term] = list()
+            #     wiktdef._index[term].append(definition)
+            #     wiktdef._definitions.append(definition)
+            # wiktdef._size = len(wiktdef._definitions)
 
         return wiktdef
 
@@ -173,24 +186,6 @@ class WiktionaryDefinitionCorpusIterator:
                                     continue
 
                                 yield sentence
-
-                # for lang in self._wiktc.langs:
-                #     for pos in term["langs"][lang]["meanings"]:
-                #         for meaning in term["langs"][lang]["meanings"][pos]:
-                #             sentence = Sentence()
-                #             sentence.annotations["definiendum"] = term["title"].strip()
-                #             sentence.annotations["definition_pos"] = pos
-                #             definition = meaning["meaning"].replace("</text>", "").strip()
-                #             sentence.surface = definition
-                #             for tok in self._wiktc.tokenizer(definition):
-                #                 token = Token()
-                #                 token.surface = tok.text
-                #                 sentence.tokens.append(token)
-                #
-                #             if (len(sentence.tokens) == 0):
-                #                 continue
-                #
-                #             yield sentence
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 [project]
 name = "saf-datasets"
-version = "0.6.18"
+version = "0.7.1"
 authors = [
   { name="Danilo S. Carvalho", email="danilo.carvalho@manchester.ac.uk" }
 ]
@@ -11,6 +11,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+license = "GPL-3.0-or-later"
 keywords = ["datasets", "annotated", "nlp"]
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]

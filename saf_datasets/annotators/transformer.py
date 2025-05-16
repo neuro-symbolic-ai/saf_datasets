@@ -8,7 +8,9 @@ from torch import argmax, as_tensor, cuda
 from transformers import AutoTokenizer, AutoConfig, AutoModelForTokenClassification
 from saf import Sentence
 from saf.annotators import Annotator
+from saf_datasets.data_access.dataset import SentenceDataSet
 from .models import PRETRAINED_MODELS
+from .common import AnnotatorException
 
 BASE_PATH = ".saf_models"
 
@@ -51,6 +53,9 @@ class TransformerAnnotator(Annotator):
         self.tag = tag
 
     def annotate(self, sentences: Iterable[Sentence]):
+        if (isinstance(sentences, SentenceDataSet) and not sentences.editing):
+            raise AnnotatorException(AnnotatorException.NO_EDIT)
+
         for sent in tqdm(sentences, desc="Annotating (Transformer)"):
             #tag each definition
             sentence = sent.surface

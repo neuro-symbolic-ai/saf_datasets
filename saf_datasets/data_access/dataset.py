@@ -1,13 +1,18 @@
 import os
+import logging
 import gdown
 import torch
 from pathlib import Path
-from typing import Tuple, List, Dict, Iterable
+from typing import Tuple, List, Dict, Iterable, Callable
 from collections import Counter
 from torch import Tensor
 from torch.nn.functional import relu
 from tqdm import tqdm
-from saf import Sentence, Vocabulary
+from pyarrow import json as pj
+from spacy.lang.en import English
+from saf import Token, Sentence, Vocabulary
+
+logging.basicConfig(level=logging.INFO)
 
 BASE_PATH = ".saf_data"
 BASE_URL = "http://personalpages.manchester.ac.uk/staff/danilo.carvalho/saf_datasets/"
@@ -20,13 +25,14 @@ class SentenceDataSet(Iterable[Sentence]):
     Attributes:
         data_path (str): The path where the dataset is stored.
     """
-    def __init__(self, path: str, url: str):
+    def __init__(self, path: str, url: str, tokenizer: Callable = None):
         """
         Initializes the SentenceDataSet object by setting up the data path and downloading the data if necessary.
 
         Args:
             path (str): The subpath to the dataset within the base path.
             url (str): The URL from which to download the dataset if it does not exist locally.
+            tokenizer (Callable): Optional custom tokenizer. Defaults to `spacy.lang.en.English`.
         """
         self.data_path: str = os.path.normpath(os.path.join(str(Path.home()), BASE_PATH, path))
         self._vocab: Dict[str, Vocabulary] = dict()
@@ -37,14 +43,56 @@ class SentenceDataSet(Iterable[Sentence]):
             os.makedirs(os.path.join(*os.path.split(self.data_path)[:-1]), exist_ok=True)
             gdown.download(url, self.data_path)
 
+        self._logger = logging.getLogger(self.__class__.__name__)
+        console = logging.StreamHandler()
+        self._logger.addHandler(console)
+        self._logger.setLevel(logging.INFO)
+
+        if (self.data_path.endswith(".jsonl.bz2")):
+            self._logger.info(" Loading datafile...")
+            self._source = pj.read_json(self.data_path, read_options=pj.ReadOptions(use_threads=True))
+        else:
+            self._source = None
+
+        self._data: List[Sentence] = None
+        self.tokenizer = English().tokenizer if (tokenizer is None) else tokenizer
+        self.editing: bool = False
+
     def __iter__(self):
-        raise NotImplementedError
+        return (self[i] for i in range(len(self)))
 
     def __len__(self):
-        raise NotImplementedError
+        return self._source.num_rows
 
     def __getitem__(self, item):
-        raise NotImplementedError
+        if (self.editing):
+            if (self._data is None):
+                self.editing = False
+                self._logger.info(f" Preloading {len(self)} entries for editing / indexing")
+                self._data = [Sentence.from_dict(obj) for obj in tqdm(self._source.to_pylist(), desc="Preloading")]
+                self.editing = True
+
+            result = self._data[item]
+
+        elif (isinstance(item, slice)):
+            start, stop, step = item.indices(self._source.num_rows)
+            indices = list(range(start, stop, step))
+            result = [Sentence.from_dict(obj) for obj in self._source.take(indices).to_pylist()]
+        else:
+            index = item if (item >= 0) else self._source.num_rows + item
+            result = Sentence.from_dict(self._source.take([index]).to_pylist()[0])
+
+        for sent in (result if isinstance(result, list) else [result]):
+            if (not sent.tokens):
+                for tok in self.tokenizer(sent.surface):
+                    token = Token()
+                    token.surface = tok.text
+                    sent.tokens.append(token)
+
+        return result
+
+    def edit(self):
+        self.editing = True
 
     def vocabulary(self, source: str = "_token", lowercase: bool = True) -> Vocabulary:
         """

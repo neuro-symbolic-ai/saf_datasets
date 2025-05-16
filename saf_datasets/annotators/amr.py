@@ -5,6 +5,8 @@ import gdown
 from typing import Iterable
 from saf import Sentence
 from saf.annotators import Annotator
+from saf_datasets.data_access.dataset import SentenceDataSet
+from .common import AnnotatorException
 
 AMRLIB_MODELS_BASE_URL = "https://github.com/bjascob/amrlib-models/releases/download/"
 AMRLIB_MODELS = {
@@ -40,6 +42,9 @@ class AMRAnnotator(Annotator):
         self.annot_model = amrlib.load_stog_model()
 
     def annotate(self, sentences: Iterable[Sentence]):
+        if (isinstance(sentences, SentenceDataSet) and not sentences.editing):
+            raise AnnotatorException(AnnotatorException.NO_EDIT)
+
         graphs = self.annot_model.parse_sents([sent.surface for sent in sentences], disable_progress=False)
         for sent, graph in zip(sentences, graphs):
             sent.annotations["amr"] = graph

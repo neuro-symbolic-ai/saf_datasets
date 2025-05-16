@@ -3,6 +3,8 @@ from typing import Iterable
 from tqdm import tqdm
 from saf import Sentence
 from saf.annotators import Annotator
+from saf_datasets.data_access.dataset import SentenceDataSet
+from .common import AnnotatorException
 
 
 class SpacyAnnotator(Annotator):
@@ -18,6 +20,9 @@ class SpacyAnnotator(Annotator):
         self.annot_model = spacy.load(annot_model)
 
     def annotate(self, sentences: Iterable[Sentence]):
+        if (isinstance(sentences, SentenceDataSet) and not sentences.editing):
+            raise AnnotatorException(AnnotatorException.NO_EDIT)
+
         for sent in tqdm(sentences, desc="Annotating (Spacy)"):
             annots = self.annot_model(sent.surface)
             for i in range(len(sent.tokens)):

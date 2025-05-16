@@ -6,14 +6,14 @@ from spacy.lang.en import English
 from saf import Sentence, Token
 from .dataset import SentenceDataSet, BASE_URL
 
-FILE_VERSION = "tr_data_type_amr_op_v0.3"
-PATH = "InferenceTypes/%s.csv.gz" % FILE_VERSION
-URL = BASE_URL + "%s.csv.gz" % FILE_VERSION
+FILE_VERSION = "inftypes_v0.3"
+PATH = "InferenceTypes/%s.jsonl.bz2" % FILE_VERSION
+URL = BASE_URL + "%s.jsonl.bz2" % FILE_VERSION
 
 ANNOT_RESOURCES = {
     "pos+lemma+ctag+dep+amr": {
-        "path": "InferenceTypes/inftypes_v0.3.pickle.gz",
-        "url": BASE_URL + "inftypes_v0.3.pickle.gz"
+        "path": "InferenceTypes/inftypes_v0.3.jsonl.bz2",
+        "url": BASE_URL + "inftypes_v0.3.jsonl.bz2"
     }
 }
 
@@ -30,49 +30,9 @@ class InferenceTypesDataSet(SentenceDataSet):
     """
     def __init__(self, path: str = PATH, url: str = URL):
         super(InferenceTypesDataSet, self).__init__(path, url)
-        self.tokenizer = English().tokenizer
-        if (not url):
-            return
 
-        with gzip.open(self.data_path, "rt", encoding="utf-8") as dataset_file:
-            self.data = list()
-            for row in tqdm(DictReader(dataset_file), desc="Loading inference types data"):
-                premise1 = row["premise1"]
-                premise2 = row["premise2"]
-                conclusion = row["conclusion"]
-                for sent, role in [(premise1, "P1"), (premise2, "P2"), (conclusion, "C")]:
-                    sentence = Sentence()
-                    sentence.annotations["id"] = row["id"]
-                    sentence.annotations["role"] = role
-                    sentence.annotations["type"] = row["type"]
-                    sentence.annotations["new_type"] = row["new_type"]
-                    sentence.annotations["type_amr_op"] = row["type_amr_op"]
-                    sentence.surface = sent.strip()
-                    for tok in self.tokenizer(sentence.surface):
-                        token = Token()
-                        token.surface = tok.text
-                        sentence.tokens.append(token)
-
-                    self.data.append(sentence)
-
-    def __iter__(self):
-        return iter(self.data)
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx: int) -> Sentence:
-        """Fetches the ith sentence in the dataset.
-
-        Args:
-            idx (int): index for the ith sentence in the dataset.
-
-        :return: A single term decomposition (Sentence).
-        """
-        return self.data[idx]
-
-    @staticmethod
-    def from_resource(locator: str):
+    @classmethod
+    def from_resource(cls, locator: str):
         """
         Downloads a pre-annotated resource available at the specified locator
 
@@ -81,11 +41,7 @@ class InferenceTypesDataSet(SentenceDataSet):
         """
         dataset = None
         if (locator in ANNOT_RESOURCES):
-            path = ANNOT_RESOURCES[locator]["path"]
-            url = ANNOT_RESOURCES[locator]["url"]
-            data_path = SentenceDataSet.download_resource(path, url)
-            with gzip.open(data_path, "rb") as resource_file:
-                dataset = pickle.load(resource_file)
+            dataset = cls(**ANNOT_RESOURCES[locator])
         else:
             print(f"No resource found at locator: {locator}")
 
