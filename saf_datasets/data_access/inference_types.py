@@ -1,5 +1,6 @@
 import pickle
 import gzip
+from typing import Callable
 from csv import DictReader
 from tqdm import tqdm
 from spacy.lang.en import English
@@ -28,8 +29,8 @@ class InferenceTypesDataSet(SentenceDataSet):
 
     Sentence annotations: id, role, type, new_type, type_amr_op
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(InferenceTypesDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(InferenceTypesDataSet, self).__init__(path, url, **kwargs)
 
     @classmethod
     def from_resource(cls, locator: str):

@@ -1,3 +1,4 @@
+from typing import Callable
 from .dataset import SentenceDataSet, BASE_URL
 
 FILE_VERSION = "entailment_trees_emnlp2021_data_v3"
@@ -25,8 +26,8 @@ class EntailmentBankDataSet(SentenceDataSet):
 
     Sentence annotations: id, task, split, type
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(EntailmentBankDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(EntailmentBankDataSet, self).__init__(path, url, **kwargs)
 
     @classmethod
     def from_resource(cls, locator: str):

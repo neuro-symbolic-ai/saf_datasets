@@ -20,6 +20,6 @@ class STSBDataSet(SentenceDataSet):
 
     Sentence annotations: id, sid, split, genre, dataset
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(STSBDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(STSBDataSet, self).__init__(path, url, **kwargs)
 

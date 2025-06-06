@@ -25,7 +25,7 @@ class SentenceDataSet(Iterable[Sentence]):
     Attributes:
         data_path (str): The path where the dataset is stored.
     """
-    def __init__(self, path: str, url: str, tokenizer: Callable = None):
+    def __init__(self, path: str, url: str, tokenizer: Callable = None, preload: bool = False):
         """
         Initializes the SentenceDataSet object by setting up the data path and downloading the data if necessary.
 
@@ -57,6 +57,10 @@ class SentenceDataSet(Iterable[Sentence]):
         self._data: List[Sentence] = None
         self.tokenizer = English().tokenizer if (tokenizer is None) else tokenizer
         self.editing: bool = False
+
+        if (preload):
+            self.edit()
+            _ = self[0]
 
     def __iter__(self):
         return (self[i] for i in range(len(self)))

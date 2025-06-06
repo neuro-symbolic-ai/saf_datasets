@@ -1,3 +1,4 @@
+from typing import Callable
 from saf import Vocabulary
 from .dataset import SentenceDataSet, BASE_URL
 from .wiktionary import WiktionaryDefinitionCorpus
@@ -28,8 +29,8 @@ class WordNetFilteredDataSet(SentenceDataSet):
     >>> dataset = WordNetFilteredDataSet.from_resource("pos+lemma+ctag+dep+dsr+srl")
 
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(WordNetFilteredDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(WordNetFilteredDataSet, self).__init__(path, url, **kwargs)
 
     def vocabulary(self, source: str = "_token", lowercase: bool = True) -> Vocabulary:
         return WiktionaryDefinitionCorpus.vocabulary(self, source, lowercase)

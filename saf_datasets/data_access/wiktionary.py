@@ -1,5 +1,4 @@
 import jsonlines
-import pickle
 import gzip
 import pyarrow
 from typing import Tuple, List, Dict, Union
@@ -31,8 +30,8 @@ class WiktionaryDefinitionCorpus(SentenceDataSet):
     >>> dataset = WiktionaryDefinitionCorpus.from_resource("pos+lemma+ctag+dep+dsr")
 
     """
-    def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",)):
-        super(WiktionaryDefinitionCorpus, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("English",), **kwargs):
+        super(WiktionaryDefinitionCorpus, self).__init__(path, url, **kwargs)
 
         self.langs: Tuple[str] = langs
         self._index: Dict[str, List[Sentence]] = dict()

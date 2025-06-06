@@ -16,6 +16,6 @@ class AllNLIDataSet(SentenceDataSet):
 
     Sentence annotations: id, dataset, split, label
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(AllNLIDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(AllNLIDataSet, self).__init__(path, url, **kwargs)
 

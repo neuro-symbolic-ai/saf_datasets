@@ -1,3 +1,4 @@
+from typing import Callable
 from .dataset import SentenceDataSet, BASE_URL
 
 FILE_VERSION = "complex_sentences"
@@ -26,6 +27,6 @@ class ComplexSentencesDataSet(SentenceDataSet):
         "IDC": "(in)direct speech"
     }
 
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(ComplexSentencesDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(ComplexSentencesDataSet, self).__init__(path, url, **kwargs)
 

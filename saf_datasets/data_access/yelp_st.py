@@ -8,5 +8,5 @@ class YelpSTDataSet(SentenceDataSet):
     """
     Wrapper for the Yelp Language Style Transfer dataset (Shen et al., 2017): https://proceedings.neurips.cc/paper_files/paper/2017/hash/2d2c8394e31101a261abf1784302bf75-Abstract.html
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(YelpSTDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(YelpSTDataSet, self).__init__(path, url, **kwargs)

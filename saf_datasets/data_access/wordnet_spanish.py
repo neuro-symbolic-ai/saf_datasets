@@ -16,5 +16,5 @@ class SpanishWordNetFilteredDataSet(SentenceDataSet):
         cess_esp_frequencies, wordnet_frequency, category, abstraction_level, generalization_level).
 
     """
-    def __init__(self, path: str = PATH, url: str = URL):
-        super(SpanishWordNetFilteredDataSet, self).__init__(path, url)
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
+        super(SpanishWordNetFilteredDataSet, self).__init__(path, url, **kwargs)

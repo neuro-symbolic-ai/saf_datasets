@@ -1,8 +1,6 @@
 import torch
-from typing import Tuple
 from torch import Tensor
-from saf import Sentence, Token
-from saf_datasets.annotators.spacy import SpacyAnnotator
+from saf import Sentence
 from .dataset import SentenceDataSet, BASE_URL
 
 PATH = "CODWOE/CODWOE.jsonl.bz2"
@@ -10,11 +8,11 @@ URL = BASE_URL + "CODWOE.jsonl.bz2"
 
 
 class CODWOEDataSet(SentenceDataSet):
-    def __init__(self, path: str = PATH, url: str = URL, langs: Tuple[str] = ("en",)):
+    def __init__(self, path: str = PATH, url: str = URL, **kwargs):
         """
         Wrapper for the CODWOE dataset from Semeval-2022 Task 1 (Mickus et al. 2022): https://github.com/TimotheeMickus/codwoe
         """
-        super(CODWOEDataSet, self).__init__(path, url)
+        super(CODWOEDataSet, self).__init__(path, url, **kwargs)
 
     def __getitem__(self, idx: int) -> Sentence:
         """Fetches the ith definition in the dataset or all definitions for a given term.
